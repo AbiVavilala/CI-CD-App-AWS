@@ -1,6 +1,8 @@
 FROM python:3.10-slim
 
 RUN pip install --upgrade pip
+# Install gunicorn
+RUN pip install gunicorn
 
 WORKDIR /app
 COPY . /app
