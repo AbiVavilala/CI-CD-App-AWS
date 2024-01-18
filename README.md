@@ -97,5 +97,36 @@ Go to AWS console, and type codebuild in the search bar. Click on the first sear
 On scrolling down, in Source section we will select Github as our source provider since our source code exists there. Now we have to authorize AWS CodeBuild to access our Github account. For this click on Connect to GitHub.
 ![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codebuild1.JPG)
 
+ Sroll down further, in Environment section choose Managed image, in Operating system choose Ubuntu, Runtime(s) as Standard, Image as aws/codebuild/standard:7.0 and rest of the field’s option to be choosen as shown in the image below. One important point, we will tick Privileged option because we have to build a Docker image
+ ![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codebuild2.JPG)
 
+ ## Define build specification
+
+ We definitely need to provide some set of instructions for our build project to ensure we get the expected output. Hence the buildspec comes into the picture. Any CodeBuild project, requires a buildspec.yml file containing all the steps that it has to perform in the build stage. And this buildspec.yml file will be located in the root directory of our source code.
+
+Let us head back to our Flask_app_CICD directory. Create a buildspec.yml file and edit this file to add all the required instruction as given below:
+
+```
+version: 0.1
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 123456789.dkr.ecr.us-east-1.amazonaws.com
+      - echo Logged in to Amazon ECR successfully
+
+  build:
+    commands:
+      - echo Building Docker Image for Flask Application
+      - docker build -t flask_image .
+      - echo Image built successfully
+
+  post_build:
+    commands:
+      - echo Tagging Flask Docker image
+      - docker tag flask_image:latest 123456789.dkr.ecr.us-east-1.amazonaws.com/flask_image:latest
+      - docker push 123456789.dkr.ecr.us-east-1.amazonaws.com/flask_image:latest
+      - echo Flask image pushed to ECR
+```
 
