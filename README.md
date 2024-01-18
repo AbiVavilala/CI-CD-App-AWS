@@ -33,7 +33,7 @@ For this project I already created a Flask application and it's on GitHub. You c
 
 Application is a static page. and will be deployed on AWS and will build pipeline using Codebuild, Code Deploy and Code Pipeline.
 
-![](https://github.com/AbiVavilala/Application-Migration-with-AWS/blob/master/images/source-env.png)
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/FlaskPic.JPG)
 
 ### Create a Docker file
 In the repo you can see a docker file add following instructions to dockerfile
