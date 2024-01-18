@@ -17,6 +17,7 @@ In this Project, we will delve deep into CI/CD using AWS. Being the most commonl
 - [Prerequisites for Code Pipeline](#Prerequisites-for-code-pipeline)
 - [Configure CodePipeline project](#Configure-Codepipeline-project)
 - [Final Result](#Final-Result)
+- [Erros and troubleshooting](#Erros-and-troubleshooting)
 
 
 ## Pipeline flow
@@ -28,7 +29,7 @@ First, we have to understand the workflow of this whole pipeline that we are abo
 4. At the end, we will use AWS CodePipeline to automate the build and deployment(in (2) and (3)) process, whenever any new changes is pushed on the githun repository
 
 
-## Create Flask Application
+## Create Application
 For this project I already created a Flask application and it's on GitHub. You can clone the repo using the url https://github.com/AbiVavilala/CI-CD-App-AWS.git. 
 
 Application is a static page. and will be deployed on AWS and will build pipeline using Codebuild, Code Deploy and Code Pipeline.
@@ -54,6 +55,22 @@ EXPOSE 5000
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
 ```
 
+## Create ECR Reposiroty
 
+Go to AWS console, and type ECR in the search bar. Click on the first search result.
 
+![]https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/Create-Ecr-repository.JPG
 
+A page will open up, where we have to select the required options to create an ECR repository. In General settingsI am keeping visbility as Private and choosing repo name as flask_image.
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/Create-Ecr-repository1.JPG)
+
+Leave the remaining settings as default
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/Create-Ecr-repository3.JPG)
+
+## Create an EC2 Instance
+
+Go to AWS console, and type ec2 in the search bar. Click on the first search result.
+
+Now launch an EC2 instance with Ubuntu OS
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/launch-Ec2-instance.JPG)
