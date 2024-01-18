@@ -74,3 +74,28 @@ Go to AWS console, and type ec2 in the search bar. Click on the first search res
 
 Now launch an EC2 instance with Ubuntu OS
 ![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/launch-Ec2-instance.JPG)
+
+EC2 instance is launched 
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/ec2instancelaunched.JPG)
+
+### Create an IAM role for EC2 instance and attached to EC2 instance.
+
+I already created IAM role with privelages. I will attach role created to EC2 instance. this way, my Ec2 instance can call other services and perform read and write access. to attach the role follow the steps below. Click on Actions then security
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/IAMroleforec2instance.JPG)
+
+click on modify IAM role
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/IAMroleforec2instance1.JPG)
+
+I have already created the role called EC2_code_deploy role. wth following policies.
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/IAMrole3.JPG)
+
+## Configure Code Build Project
+
+Go to AWS console, and type codebuild in the search bar. Click on the first search result. Click on Build Project 
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/Codebuild.JPG)
+
+On scrolling down, in Source section we will select Github as our source provider since our source code exists there. Now we have to authorize AWS CodeBuild to access our Github account. For this click on Connect to GitHub.
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codebuild1.JPG)
+
+
+
