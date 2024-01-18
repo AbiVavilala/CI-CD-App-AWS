@@ -147,3 +147,5 @@ Excited to see CodeBuild in action. Okay, Click the Start build button.
 1. Navigate to IAM (Identity and Access Management) on AWS management console.
 2. In the left navigation pane, click on Roles, then click Create role.
 
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/1_E9lmbEVl8NuV68uiLV92Kw.png)
+
