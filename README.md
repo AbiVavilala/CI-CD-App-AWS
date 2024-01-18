@@ -231,6 +231,35 @@ if ! command -v aws &>/dev/null; then
 fi
     echo "AWS CLI is already installed."
 ```
+Third after_install.sh will be executed during deployment. This shell script will be responsible for logging into the ECR and pulling the flask image from the respective repository.
+```
+#!/bin/bash
+
+echo "Logging in to Amazon ECR..."
+docker login --username AWS --password $(aws ecr get-login-password --region us-east-1) 123456789.dkr.ecr.us-east-1.amazonaws.com
+echo "Logged in to Amazon ECR successfully."
+
+echo "Pulling image from Amazon ECR"
+docker pull 123456789.dkr.ecr.us-east-1.amazonaws.com/flask_image:latest
+echo "Pulled image from Amazon ECR successfully."
+```
+Fourth application_start.sh will be executed during deployment. This script will run the docker container at port 5000 in detached mode.
+```
+echo "Running container..."
+docker run --name flask_app -d -p 5000:5000 123456789.dkr.ecr.us-east-1.amazonaws.com/flask_image:latest
+```
+
+## Preparing EC2 instance for Deployment
+
+To prepare our EC2 instance ready to be used by CodeDeploy for automatic deployment of our application, we need to do two things:
+
+Installation of CodeDeploy Agent
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/prepareec2.JPG)
+Installation and configuration Nginx
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/prepareec22.JPG)
+
+## Configure CodeDeploy project
+
 
 
 
