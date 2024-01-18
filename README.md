@@ -260,6 +260,120 @@ Installation and configuration Nginx
 
 ## Configure CodeDeploy project
 
+Go to AWS console, and type codedeploy in the search bar. Click on the first search result.
 
+Click on Create application.
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codedeploy.JPG)
+
+While creating an Application under CodeDeploy, we don’t have to do much. We have to give a name to our Application, I am using FlaskApplication. And in Compute platform we have to select EC2/On-premise option. And the click on Create Application.
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codedeploy1.JPG)
+
+We can see a message “Application Created”.
+
+After creating a CodeDeploy FlaskApplication Application, now we will create a deployment group under this application.
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codedeploy2.JPG)
+
+Scroll down, then select the service role CodeDeploy-Role we have created in section 8 of this tutorial. Select In-place for the Deployment type.
+
+
+In the Environment configuration, select Amazon EC2 instances. If you remember from Part 1, we have given Flask-Server name to our EC2 instance. That name will be helpful for us now, to identify whcich EC2 instance to be used by this CodeDeployment Group.
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codedeploy3.JPG)
+
+In Deployment settings, again we will keep the default setting. However in Load balancer, Enable load balancing is by default selected. We will deselect this option. No need to make any changes in Advanced option. Just click Create deployment group.
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codedeploy5.JPG)
+
+And we are done with a deployment group. Under this deployment group we will create a deployment next
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codedeploy6.JPG)
+
+Again here (same as CodeBuild), we have to give access of Github to CodeDeploy so that it can access the required repositories. Click on Connect to Github and continue as prompted. After connecting Github, in Repository name give the name of our Flask application repository and the format should be <github username>/<repository name>. In commit ID, paste the id of the last commit which you want to deploy.
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codedeploy7.JPG)
+
+Scroll down further, in Additional deployment behavior settings and further section no need to change or select anything. We will keep everything at default and click on create deployment
+
+We can see, a deployment is in progress. Wait for few minutes for the deployment to completed.
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codedeploy8.JPG)
+
+Now we open any browser in our system and type http://our-ip-address-of-ec2-instance press enter. Voila! Our webApp is online. 
+
+## Prerequisites for Code Pipeline
+AWS CodePipeline uses artifacts to pass files and data between different stages of the pipeline. Now you may ask, what is artifacts? Artifacts are bunch of files and data produced in one stage of C/CD pipeline. In this pipeline, we have two stages one is build stage and another is deploy stage. So, in build stage(CodeBuild stage) of our pipeline, build artifacts will be generated. And these build artifacts will be passed on to the deployment stage(CodeDeploy stage) by using an S3 bucket. The respective S3 bucket will just store required build artifacts, and the deployment stage will pick it up from there.
+
+For this artifacts to be ready for passing on, we have to do one change in buildspec.yml file(created in Part 2). We have to add artifacts configuration, edit buildspec.yml and add the following section at the end:
+
+```
+artifacts:
+  files:
+    - 'scripts/**/*'
+    - 'appspec.yml'
+```
+
+In files section of artifacts we are specifying, to include all the files and folders inside scripts and appspec.yml file. This is how our final builspec.yml file looks:
+
+```
+version: 0.1
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 123456789.dkr.ecr.us-east-1.amazonaws.com
+      - echo Logged in to Amazon ECR successfully
+
+  build:
+    commands:
+      - echo Building Docker Image for Flask Application
+      - docker build -t flask_image .
+      - echo Image built successfully
+
+  post_build:
+    commands:
+      - echo Tagging Flask Docker image
+      - docker tag flask_image:latest 123456789.dkr.ecr.us-east-1.amazonaws.com/flask_image:latest
+      - docker push 123456789.dkr.ecr.us-east-1.amazonaws.com/flask_image:latest
+      - echo Flask image pushed to ECR
+
+artifacts:
+ files:
+  - 'scripts/**/*'
+  - 'appspec.yml'
+```
+
+## Configure CodePipeline project
+
+Go to AWS console, and type codepipeline in the search bar. Click on the first search result.
+
+Click on the Create pipeline button, given at right side.
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/createpipeline.JPG)
+
+In the step 1(Choose pipeline settings), we will give a name to this CI/CD pipeline. I am choosing CICDPipeline as the name of the pipeline. In the service role select, New service role option. And tick, Allow AWS CodePipeline to create a service role so it can be used with this new pipeline option if it is not selected by default.
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codepipeline1.JPG)
+
+Scroll down, in Advanced settings keep both Artifact store and Encryption key at default option. Then click Next
+
+ In Step 2(Add source stage), select Github (Version 2) as source provider. Then click on Connect to Github
+ ![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codepipeline3.JPG)
+
+ And follow along the prompts we get while connecting to Github. Give some connection name to identify this connection. Click Connect to Github and proceed.
+ ![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codepipeline4.JPG)
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codepipeline5.JPG)
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codepipeline6.JPG)
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codepipeline7.JPG)
+
+In step 3(Add build stage), select AWS CodeBuild as Build provider. Select the region where the respective build project exists. Then select name of the build project i.e FlaskAppBuild created by us in part 2
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codepipeline8.JPG)
+
+In step 4(Add deploy stage), choose AWS CodeDeploy as Deploy provider. Select the region where your deployment application exists
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codepipeline9.JPG)
+
+In Application name, select the application that we have created in Part 3 and in Deployment group, choose the deployment group created under our respective deployment. Now, click Next.
 
 
