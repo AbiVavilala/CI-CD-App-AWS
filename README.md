@@ -129,4 +129,21 @@ phases:
       - docker push 123456789.dkr.ecr.us-east-1.amazonaws.com/flask_image:latest
       - echo Flask image pushed to ECR
 ```
+Note: Replace 123456789.dkr.ecr.us-east-1.amazonaws.com with your own ECR repository URI
+
+In buildspec.yml, we can see there are three phases.
+
+pre_build: This phase will log in to the Amazon ECR repository.
+
+build: This phase will build a docker image of our Flask Application by using the Dockerfile we have in the repository.
+
+post_build: This phase will take the docker image from previous(build) phase, tag that image and push that tagged image to the ECR repository(flask_image).
+Now, we will push this buildspec.yml file to our Source Code(GitHub Repository) using following command:
+
+Start Build Process
+Excited to see CodeBuild in action. Okay, Click the Start build button.
+
+## Create IAM role for CodeDeploy
+1. Navigate to IAM (Identity and Access Management) on AWS management console.
+2. In the left navigation pane, click on Roles, then click Create role.
 
