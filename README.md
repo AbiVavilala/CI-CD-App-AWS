@@ -5,7 +5,7 @@ In this Project, we will delve deep into CI/CD using AWS. Being the most commonl
 ## Table of Contents
 
 - [Pipeline flow](#Pipeline-flow)
--[Create Application](#Create-Application)
+- [Create Application](#Create-Application)
 - [Create ECR Repository](#Create-ECR-Repository)
 - [Create an EC2 instance](#Create-an-EC2-Instance)
 - [Configure CodeBuild project](#Configure-Codebuild-Project)
