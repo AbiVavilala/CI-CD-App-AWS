@@ -149,3 +149,88 @@ Excited to see CodeBuild in action. Okay, Click the Start build button.
 
 ![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/1_E9lmbEVl8NuV68uiLV92Kw.png)
 
+ We will be redirected to a new page for creating IAM roles. In Trusted entity type, select AWS service.
+ ![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/IAMcodedeploy.png)
+
+ In Add permissions, there is already one policy added(AWSCodeDeploy). Nothing to do here, just click Next.
+ ![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/IAMcodedeploy2.png)
+
+ Click on Create the role.
+
+## Define deployment specification
+
+In the root directory of our Flask Application, we will create a yaml file appspec.yml . Edit it and add the following instructions:
+
+```
+version: 0.0
+os: linux
+
+hooks:
+  ApplicationStop:
+    - location: scripts/application_stop.sh
+      timeout: 300
+      runas: root
+
+  BeforeInstall:
+    - location: scripts/before_install.sh
+      timeout: 300
+      runas: root
+
+  AfterInstall:
+    - location: scripts/after_install.sh
+      timeout: 300
+      runas: root
+      
+  ApplicationStart:
+    - location: scripts/application_start.sh
+      timeout: 300
+      runas: root
+```
+In the root directory create one folder named as scripts. This scripts directory contains all those shell scripts that is needed by all the lifecycle events defined by us in the appspec.yml file.
+First application_stop.sh will be executed during deployment. This shell script will contain commands that is responsible for stopping docker containers, removing those containers and finally removing the pre-existing docker image. Now, one may ask why do we need to do these steps of stopping and removing? Okay, the answer is: think of these steps as a way of clearing out older version of docker image or containers(if exists) and making space for new and update docker images and running updated containers.
+
+```
+#!/bin/bash
+
+echo "This Script is used to stop already running docker container, remove them and remove the image as well"
+
+sudo docker stop $(sudo docker ps -q)
+sudo docker rm $(sudo docker ps -a -q)
+sudo docker rmi $(sudo docker images -q)
+```
+
+Second before_install.sh will be executed during deployment. This shell script checks if Docker and AWS CLI are installed on the EC2 instance or not. If those are not installed then, Docker and AWS CLI will be installed.
+
+```
+#!/bin/bash
+
+# Check if Docker is installed
+if ! command -v docker &> /dev/null; then
+    echo "Docker not found. Installing Docker..."
+    sudo apt-get update -y
+    sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+    sudo apt-get install -y docker-ce
+
+    # Start Docker
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    sudo apt-get install awscli -y
+
+    # Add the current user to Docker group
+    sudo usermod -aG docker ubuntu
+    echo "Docker installed successfully."
+fi
+    echo "Docker Found"
+
+if ! command -v aws &>/dev/null; then
+    echo "AWS CLI not found. Installing AWS CLI..."
+    sudo apt-get update -y
+    sudo apt-get install awscli -y
+fi
+    echo "AWS CLI is already installed."
+```
+
+
+
