@@ -33,6 +33,26 @@ For this project I already created a Flask application and it's on GitHub. You c
 
 Application is a static page. and will be deployed on AWS and will build pipeline using Codebuild, Code Deploy and Code Pipeline.
 
+![](https://github.com/AbiVavilala/Application-Migration-with-AWS/blob/master/images/source-env.png)
+
+### Create a Docker file
+In the repo you can see a docker file add following instructions to dockerfile
+
+```
+FROM public.ecr.aws/docker/library/python:3.10-slim
+
+RUN pip install --upgrade pip
+
+WORKDIR /app
+COPY . /app
+
+RUN pip install gunicorn
+RUN python -m pip install -r requirements.txt
+
+EXPOSE 5000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+```
 
 
 
