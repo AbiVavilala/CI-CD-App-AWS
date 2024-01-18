@@ -376,4 +376,37 @@ In step 4(Add deploy stage), choose AWS CodeDeploy as Deploy provider. Select th
 
 In Application name, select the application that we have created in Part 3 and in Deployment group, choose the deployment group created under our respective deployment. Now, click Next.
 
+ Here, we can see the summary of all options we have selected in previous steps such as what is the source, the repository, the build project, and the deployment project. Scroll down, and click on Create pipeline.
 
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codepipeline10.png)
+
+After creating the pipeline, just wait and watch all the stages getting completed one by one. Our pipeline has sourced the required set of code base, docker image is built in Build stage and lastly flask application is deployed in Deployment stage.
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codepipeline11.JPG)
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codepipeline12.JPG)
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codepipeline13.JPG)
+
+## Final Result
+
+Browse the Public IP address of EC2 instance and you can see Web application running
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/finaltest1.JPG)
+
+Now to test our pipeline lets make a small change to the index.html file I am adding a line to the file
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/finaltest2.JPG)
+
+
+We have added this <p>This is my final test for testing pipeline</p> . Now save and push the code on Github. We can see on the FlaskCICD pipeline page, the pipeline is triggered.
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/finaltest3.JPG)
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/finaltest4.JPG)
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/finaltest5.JPG)
+
+now lets refresh the web application 
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/finaltest6.JPG)
+
+We can see the webapp is up with the changes.
