@@ -10,14 +10,14 @@ In this Project, we will delve deep into CI/CD using AWS. Being the most commonl
 - [Create an EC2 instance](#Create-an-EC2-Instance)
 - [Configure CodeBuild project](#Configure-Codebuild-Project)
 - [Define build specification](#Define-Build-Specification)
-- [Create IAM role for code deploy](#Create-IAM-Role-for-code-deploy)
+- [Create IAM role for codedeploy](#Create-IAM-Role-for-codedeploy)
 - [Define deployment specification](#Define-deployment-specification)
 - [Preparing EC2 instance for deployment](#Preparing-EC2-instance-for-deployment)
-- [Configure CodeDeploy project](#Cofigure-CodeDeploy-project)
+- [Configure CodeDeploy project](#Configure-CodeDeploy-project)
 - [Prerequisites for Code Pipeline](#Prerequisites-for-code-pipeline)
 - [Configure CodePipeline project](#Configure-Codepipeline-project)
 - [Final Result](#Final-Result)
-- [Erros and troubleshooting](#Erros-and-troubleshooting)
+- [Errors and troubleshooting](#Erros-and-troubleshooting)
 
 
 ## Pipeline flow
@@ -55,7 +55,7 @@ EXPOSE 5000
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
 ```
 
-## Create ECR Reposiroty
+## Create ECR Repository
 
 Go to AWS console, and type ECR in the search bar. Click on the first search result.
 
@@ -89,7 +89,7 @@ click on modify IAM role
 I have already created the role called EC2_code_deploy role. wth following policies.
 ![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/IAMrole3.JPG)
 
-## Configure Code Build Project
+## Configure CodeBuild Project
 
 Go to AWS console, and type codebuild in the search bar. Click on the first search result. Click on Build Project 
 ![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/Codebuild.JPG)
@@ -410,3 +410,61 @@ now lets refresh the web application
 ![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/finaltest6.JPG)
 
 We can see the webapp is up with the changes.
+
+## Erros and Troubleshooting
+
+I am documneting some of the common errors I encountered while working on this project. I will also mention, how I resolved the errors.
+
+### Error No 1
+
+One of the errors I encountered was when I clicked on Start button in CodeBuild Project. My prebuild state was failing. please see the image below  for the error.
+
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/codebuilderror.JPG)
+
+The above error suggests that, the IAm Role/Service Role attached to this codebuild project doesn’t have permission to the service role used by CodeBuild. I resolved this error by attaching AmazonEC2containerRegistry fullAccess permission to codebuild-Flaskappbuild-service-role.
+
+### Error No2:
+One of the other error I encountered is at CodeDeploy stage. Please see the Error below.
+
+```
+LifecycleEvent - ApplicationStart Script - scripts/application_start.sh [stdout]Running container... [stderr]Unable to find image '642655931180.dkr.ecr.ap-southeast-2.amazonaws.com/flask_image:latest' locally [stderr]docker: Error response from daemon: Head "https://642655931180.dkr.ecr.ap-southeast-2.amazonaws.com/v2/flask_image/manifests/latest": no basic auth credentials. [stderr]See 'docker run --help'.
+
+```
+
+Resoultion:
+
+Error indicated Docker is unable to find specified image in local repository and it’s also failing to authenticate with ECR registry before attempting to run the container. I resolved this error by modifying scripts/application_start.sh to 
+
+```
+#!/bin/bash
+
+# Authenticate Docker with ECR
+aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 642655931180.dkr.ecr.ap-southeast-2.amazonaws.com
+
+# Run the Docker container
+docker run -d -p 80:80 642655931180.dkr.ecr.ap-southeast-2.amazonaws.com/flask_image:latest
+```
+
+### Error No3.
+
+One more error I encountered is Wrong port Mapping:
+In my scripts/application_start.sh, I mapped docker container to run on port 80:80 and however, my nginx webserver I was using Port 5000. My code deploy code was getting to successful stage but I couldn’t see my application. I killed all the running docker containers on my EC2 instance and changed my scripts/application_start.sh to docker run to 
+
+```
+#!/bin/bash
+
+# Authenticate Docker with ECR
+aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 642655931180.dkr.ecr.ap-southeast-2.amazonaws.com
+
+# Run the Docker container
+docker run -d -p 5000:5000 642655931180.dkr.ecr.ap-southeast-2.amazonaws.com/flask_image:latest
+
+```
+
+### Error No4: 
+
+Another Error I encountered is 
+
+- ApplicationStart Script - scripts/application_start.sh [stderr] [stderr]An error occurred (AccessDeniedException) when calling the GetAuthorizationToken operation: User: arn:aws:sts::642655931180:assumed-role/EC2_codedeploy_role/i-01345e8468ffddd05 is not authorized to perform: ecr:GetAuthorizationToken on resource: * because no identity-based policy allows the ecr:GetAuthorizationToken action [stderr]Error: Cannot perform an LifecycleEvent interactive login from a non TTY device [stderr]Unable to find image '642655931180.dkr.ecr.ap-southeast-2.amazonaws.com/flask_image:latest' locally [stderr]docker: Error response from daemon: Head "https://642655931180.dkr.ecr.ap-southeast-2.amazonaws.com/v2/flask_image/manifests/latest": no basic auth credentials. [stderr]See 'docker run --help'.
+
+I resolved this error by attaching permission AmazonEC2ContainerRegistryPowerUser and AmazonEC2ContainerRegistryReadOnly to EC2_codedeploy_role 
