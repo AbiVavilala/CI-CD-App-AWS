@@ -2,6 +2,7 @@
 
 In this Project, we will delve deep into CI/CD using AWS. Being the most commonly used cloud services, AWS has emerged as a frontrunner in providing scalable and trustworthy options for setting up CI/CD pipelines. From it’s Devops-focused tools we will use AWS CodeBuild, CodeDeploy and CodePipeline. Trio of these tools work flawlessly with each other in to offer an end-to-end solution. Throughout this series, CI/CD guide, I’ll walk you through each step — from setting up an EC2 instance to attaching the appropriate service roles for our pipeline. Stay tuned as we unpack each stage in this blog.
 
+![](https://github.com/AbiVavilala/CI-CD-App-AWS/blob/main/CI/CDpics/devops.png)
 ## Table of Contents
 
 - [Pipeline flow](#Pipeline-flow)
