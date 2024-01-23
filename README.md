@@ -412,7 +412,7 @@ now lets refresh the web application
 
 We can see the webapp is up with the changes.
 
-## Erros and Troubleshooting
+## Errors and Troubleshooting
 
 I am documneting some of the common errors I encountered while working on this project. I will also mention, how I resolved the errors.
 
